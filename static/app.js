@@ -106,16 +106,21 @@ function render() {
     executionHistory().catch((e) => toast(e.message));
   else resources();
 }
-function avatarClass(value) {
-  return (
-    {
-      researcher: "portrait portrait-0",
-      writer: "portrait portrait-1",
-      reviewer: "portrait portrait-2",
-      robot: "portrait robot-agent",
-    }[value] || "portrait robot-agent"
-  );
+function avatarIdentity(value, id) {
+  if (id === "layout-designer" && value === "writer") return "designer";
+  if (id === "pdf-generator" && value === "robot") return "publisher";
+  const portraits = { researcher: "illustrator", writer: "scriptwriter", reviewer: "validator", robot: "orchestrator" };
+  return Object.hasOwn(portraits, value) ? portraits[value] : "orchestrator";
 }
+
+function avatarImage(value, id) {
+  return `/portrait-${avatarIdentity(value, id)}.jpg`;
+}
+
+function avatarMarkup(value, id) {
+  return `<img class="avatar portrait" src="${avatarImage(value, id)}" width="64" height="64" alt="">`;
+}
+
 function dashboard() {
   const exampleCount = state.agents.filter((a) => a.example).length;
   const cards = [
@@ -140,11 +145,7 @@ function dashboard() {
     ],
   ];
   $("#main").innerHTML =
-    `<section class="axa-hero"><div><h1>AXA Agent Sim</h1><p>Build and observe AI teams for insurance workflows.</p><button class="primary" data-open="Watch &amp; run">Open execution workspace</button></div><img src="/motor-city.jpg" alt="Car parked on a street in Brussels"></section><section class="panel"><h2>Start here</h2><p>${state.agents.length ? `You have ${state.agents.length} saved agents. ${exampleCount} ${exampleCount === 1 ? "is an example configuration" : "are example configurations"}.` : "This workspace is empty. Start with your own agent, or load a small example team."}</p><div class="toolbar"><button class="primary" id="ownSetup">${state.agents.length ? "Open my agents" : "Start empty · create my first agent"}</button><button id="examples">${exampleCount ? "View example agents" : "Open Brain examples"}</button></div></section><div class="list dashboard-cards">${cards.map(([name, description, count]) => `<button class="panel dashboard-card" data-open="${name}"><span class="dashboard-count">${esc(count)}</span><h2>${name}</h2><p>${description}</p><span>Open →</span></button>`).join("")}</div><section class="motor-examples"><h2>Motor insurance examples</h2><div class="motor-grid">${[
-    ["motor-city.jpg", "City driving", "Explore an everyday vehicle scenario."],
-    ["motor-electric.jpg", "Electric mobility", "Explore an electric vehicle scenario."],
-    ["motor-touring.jpg", "Family travel", "Explore a family vehicle scenario."],
-  ].map(([image, title, detail]) => `<article class="panel motor-example"><img src="/${image}" alt="" loading="lazy"><div><h3>${title}</h3><p>${detail}</p></div></article>`).join("")}</div><button id="dashboardConnect">OpenAI connection status</button></section>`;
+    `<section class="axa-hero"><div><h1>AXA Agent Sim</h1><p>Build and observe AI teams for insurance workflows.</p><button class="primary" data-open="Watch &amp; run">Open execution workspace</button></div><img src="/motor-city.jpg" alt="Car parked on a street in Brussels"></section><section class="panel"><h2>Start here</h2><p>${state.agents.length ? `You have ${state.agents.length} saved agents. ${exampleCount} ${exampleCount === 1 ? "is an example configuration" : "are example configurations"}.` : "This workspace is empty. Start with your own agent, or load a small example team."}</p><div class="toolbar"><button class="primary" id="ownSetup">${state.agents.length ? "Open my agents" : "Start empty · create my first agent"}</button><button id="examples">${exampleCount ? "View example agents" : "Open Brain examples"}</button></div></section><div class="list dashboard-cards">${cards.map(([name, description, count], i) => `<button class="panel dashboard-card" data-open="${name}"><img class="dashboard-image" src="/card-${["brain", "agents", "teams", "tools", "skills", "mcp", "watch"][i]}.jpg" width="720" height="360" alt=""><span class="dashboard-count">${esc(count)}</span><h2>${name}</h2><p>${description}</p><span>Open →</span></button>`).join("")}</div>`;
   document.querySelectorAll("[data-open]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -165,7 +166,6 @@ function dashboard() {
       toast(e.message);
     }
   };
-  $("#dashboardConnect").onclick = connection;
 }
 function usageLabel(r, until = Infinity) {
   if (!r) return "Not reported";
@@ -217,7 +217,7 @@ function liveAgentCard(a, managerId) {
   const known =
     usage.length &&
     usage.every((s) => s.inputTokens != null && s.outputTokens != null);
-  return `<article class="agent live-agent activity-${status} ${selectedAgentId === id ? "selected" : ""}" data-agent="${esc(id)}" tabindex="0" role="button" aria-label="Inspect ${esc(a.agent)}"><span class="agent-kind">${id === managerId ? "Team manager" : "Agent"}</span><div class="live-avatar"><div class="avatar ${avatarClass(a.avatar)}" aria-hidden="true"></div></div><h2>${esc(a.agent)}</h2><span class="badge"><span class="activity-dot" aria-hidden="true"></span>${labels[status]}</span><p>${esc(state.agents.find((x) => x.id === id)?.role || "Saved agent")}</p><small>${usage.length} completed task${usage.length === 1 ? "" : "s"}${known ? ` · ${usage.reduce((n, s) => n + s.inputTokens + s.outputTokens, 0)} tokens` : ""}</small></article>`;
+  return `<article class="agent live-agent activity-${status} ${selectedAgentId === id ? "selected" : ""}" data-agent="${esc(id)}" tabindex="0" role="button" aria-label="Inspect ${esc(a.agent)}"><span class="agent-kind">${id === managerId ? "Team manager" : "Agent"}</span><div class="live-avatar">${avatarMarkup(a.avatar, id)}</div><h2>${esc(a.agent)}</h2><span class="badge"><span class="activity-dot" aria-hidden="true"></span>${labels[status]}</span><p>${esc(state.agents.find((x) => x.id === id)?.role || "Saved agent")}</p><small>${usage.length} completed task${usage.length === 1 ? "" : "s"}${known ? ` · ${usage.reduce((n, s) => n + s.inputTokens + s.outputTokens, 0)} tokens` : ""}</small></article>`;
 }
 function chatTarget() {
   return mode === "one"
@@ -583,7 +583,7 @@ function catalog() {
   const agents = page === "Agents",
     key = agents ? "agents" : "teams";
   $("#main").innerHTML =
-    `<h1>${page}</h1><p class="subtitle">${agents ? "Give each agent a clear job." : "Choose a manager and the agents who work with it."}</p><div class="toolbar"><button class="primary" id="add">+ Add ${agents ? "agent" : "team"}</button><button id="export">Export setup</button><label><button id="importButton">Import setup</button><input hidden type="file" accept="application/json,.json" id="import"></label></div><div class="list">${state[key].map((a) => `<section class="panel">${agents ? `<div class="avatar ${avatarClass(a.avatar)}" aria-hidden="true"></div>` : ""}<h2>${esc(a.name)}</h2>${a.example ? '<span class="badge">Example configuration</span>' : '<span class="badge">Your saved configuration</span>'}<p>${esc(agents ? a.job : `${a.manager ? `Manager: ${state.agents.find((x) => x.id === a.manager)?.name} · ` : "Choose a manager · "}${a.agents.map((id) => state.agents.find((x) => x.id === id)?.name).join(" · ")}`)}</p><button data-edit="${esc(a.id)}">Edit</button> <button class="danger" data-delete="${esc(a.id)}">Delete</button></section>`).join("")}</div>`;
+    `<h1>${page}</h1><p class="subtitle">${agents ? "Give each agent a clear job." : "Choose a manager and the agents who work with it."}</p><div class="toolbar"><button class="primary" id="add">+ Add ${agents ? "agent" : "team"}</button><button id="export">Export setup</button><label><button id="importButton">Import setup</button><input hidden type="file" accept="application/json,.json" id="import"></label></div><div class="list">${state[key].map((a) => `<section class="panel">${agents ? avatarMarkup(a.avatar, a.id) : ""}<h2>${esc(a.name)}</h2>${a.example ? '<span class="badge">Example configuration</span>' : '<span class="badge">Your saved configuration</span>'}<p>${esc(agents ? a.job : `${a.manager ? `Manager: ${state.agents.find((x) => x.id === a.manager)?.name} · ` : "Choose a manager · "}${a.agents.map((id) => state.agents.find((x) => x.id === id)?.name).join(" · ")}`)}</p><button data-edit="${esc(a.id)}">Edit</button> <button class="danger" data-delete="${esc(a.id)}">Delete</button></section>`).join("")}</div>`;
   $("#add").onclick = () => editor(key);
   document
     .querySelectorAll("[data-edit]")
@@ -681,7 +681,7 @@ function agentEditor(id) {
       )
       .join(
         "",
-      )}</div><form id="agentForm" novalidate><section id="panel-profile" role="tabpanel" aria-labelledby="tab-profile"><fieldset class="avatar-choices"><legend>Choose a role marker</legend>${["researcher", "writer", "reviewer", "robot"].map((v) => `<label class="avatar-choice"><input type="radio" name="avatar" value="${v}" ${(a.avatar || "robot") === v ? "checked" : ""}><span class="avatar ${avatarClass(v)}" aria-hidden="true"></span><span>${v === "robot" ? "Generalist" : v[0].toUpperCase() + v.slice(1)}</span></label>`).join("")}</fieldset><div class="form-grid">${field("name", "Name", "A short label, such as Picnic researcher.")}${field("role", "Role or specialty", "What is this agent good at? Used as CrewAI role.")}</div></section><section id="panel-job" role="tabpanel" aria-labelledby="tab-job" hidden><h3>What should this agent do?</h3>${field("goal", "Goal", "The job this agent should achieve. Used as CrewAI goal.", true)}${field("purpose", "What is this agent for?", "Helps the agent understand its purpose.", true)}${field("backstory", "Context and characteristics", "Background, audience and expertise. Used in CrewAI backstory.", true)}${field("instructions", "Instructions and boundaries", "How should it work? Be concrete. These instructions are sent with its task.", true)}${field("expectedOutput", "Expected result", "Describe the answer you want. Used as the task expected output.", true)}</section><section id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden><section class="panel"><h3>This agent's model</h3><label class="field">Model<select name="modelName" id="agentModel" aria-describedby="agentModelStatus"><option value="">Choose an available model</option>${a.model.name ? `<option value="${esc(a.model.name)}" selected>${esc(a.model.name)} · saved, availability not checked</option>` : ""}</select></label><p id="agentModelStatus" class="muted" role="status" aria-live="polite">Models load automatically from your connected account.</p><button type="button" id="agentModels">Refresh models</button><small class="model-hint">Each agent keeps its own model. A blank model is allowed in a saved draft, but real execution will ask you to select one.</small></section><details><summary>Teaching examples</summary><p>Examples show a style. They are clearly marked as examples, not the current goal or verified facts.</p>${field("exampleInput", "Example input", "", true)}${field("exampleOutput", "Example answer", "", true)}</details><details><summary>Advanced: model and behavior</summary><p>Optional model parameters are sent only when set. Model selection belongs to this agent.</p><div class="form-grid"><label class="field">Temperature (optional)<input type="number" step="0.1" min="0" max="2" name="temperature" value="${a.model.temperature ?? ""}"><small>Blank leaves the provider default. Some models reject temperature; a failed request is shown, never silently changed.</small></label><label class="field">Output token limit (optional)<input type="number" min="16" max="16000" name="maxOutputTokens" value="${a.model.maxOutputTokens ?? ""}"><small>Sent as max_output_tokens only when set. Check your model's supported limits.</small></label><label class="field">CrewAI context budget<input type="number" name="contextWindow" min="4096" max="2000000" value="${a.model.contextWindow ?? 32000}"><small>Used by CrewAI to manage long conversations. Set it to your model's actual capacity; this does not enlarge the model.</small></label>${[
+      )}</div><form id="agentForm" novalidate><section id="panel-profile" role="tabpanel" aria-labelledby="tab-profile"><fieldset class="avatar-choices"><legend>Choose a portrait</legend>${["researcher", "writer", "reviewer", "robot"].map((v) => `<label class="avatar-choice"><input type="radio" name="avatar" value="${v}" ${(a.avatar || "robot") === v ? "checked" : ""}>${avatarMarkup(v, a.id)}<span>${v === "robot" ? "Generalist" : v[0].toUpperCase() + v.slice(1)}</span></label>`).join("")}</fieldset><div class="form-grid">${field("name", "Name", "A short label, such as Picnic researcher.")}${field("role", "Role or specialty", "What is this agent good at? Used as CrewAI role.")}</div></section><section id="panel-job" role="tabpanel" aria-labelledby="tab-job" hidden><h3>What should this agent do?</h3>${field("goal", "Goal", "The job this agent should achieve. Used as CrewAI goal.", true)}${field("purpose", "What is this agent for?", "Helps the agent understand its purpose.", true)}${field("backstory", "Context and characteristics", "Background, audience and expertise. Used in CrewAI backstory.", true)}${field("instructions", "Instructions and boundaries", "How should it work? Be concrete. These instructions are sent with its task.", true)}${field("expectedOutput", "Expected result", "Describe the answer you want. Used as the task expected output.", true)}</section><section id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden><section class="panel"><h3>This agent's model</h3><label class="field">Model<select name="modelName" id="agentModel" aria-describedby="agentModelStatus"><option value="">Choose an available model</option>${a.model.name ? `<option value="${esc(a.model.name)}" selected>${esc(a.model.name)} · saved, availability not checked</option>` : ""}</select></label><p id="agentModelStatus" class="muted" role="status" aria-live="polite">Models load automatically from your connected account.</p><button type="button" id="agentModels">Refresh models</button><small class="model-hint">Each agent keeps its own model. A blank model is allowed in a saved draft, but real execution will ask you to select one.</small></section><details><summary>Teaching examples</summary><p>Examples show a style. They are clearly marked as examples, not the current goal or verified facts.</p>${field("exampleInput", "Example input", "", true)}${field("exampleOutput", "Example answer", "", true)}</details><details><summary>Advanced: model and behavior</summary><p>Optional model parameters are sent only when set. Model selection belongs to this agent.</p><div class="form-grid"><label class="field">Temperature (optional)<input type="number" step="0.1" min="0" max="2" name="temperature" value="${a.model.temperature ?? ""}"><small>Blank leaves the provider default. Some models reject temperature; a failed request is shown, never silently changed.</small></label><label class="field">Output token limit (optional)<input type="number" min="16" max="16000" name="maxOutputTokens" value="${a.model.maxOutputTokens ?? ""}"><small>Sent as max_output_tokens only when set. Check your model's supported limits.</small></label><label class="field">CrewAI context budget<input type="number" name="contextWindow" min="4096" max="2000000" value="${a.model.contextWindow ?? 32000}"><small>Used by CrewAI to manage long conversations. Set it to your model's actual capacity; this does not enlarge the model.</small></label>${[
       [
         "maxIterations",
         "Maximum work cycles",
@@ -1265,7 +1265,7 @@ function executionActor(event, record) {
     || state.agents.find(a => a.id === id);
   const name = actor?.agent || actor?.name || d.selectedBy || d.from || d.agent || d.result?.agent;
   if (!name) return '<div class="execution-actor system-actor">System · execution service</div>';
-  return `<div class="execution-actor"><span class="execution-avatar" role="img" aria-label="${esc(name)} avatar"><span class="avatar ${avatarClass(actor?.avatar || d.avatar || d.result?.avatar || "robot")}" aria-hidden="true"></span></span><strong>${esc(name)}</strong></div>`;
+  return `<div class="execution-actor"><span class="execution-avatar" role="img" aria-label="${esc(name)} avatar">${avatarMarkup(actor?.avatar || d.avatar || d.result?.avatar || "robot", id)}</span><strong>${esc(name)}</strong></div>`;
 }
 function interactionTimeline(record = run) {
   const events = record?.events || [];

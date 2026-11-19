@@ -4,6 +4,7 @@ This folder is the source of project requirements and delivery truth. It is not 
 
 - [Requirements](REQUIREMENTS.md)
 - [Architecture and decisions](ARCHITECTURE.md)
+- [AXA Secure GPT integration](SECURE_GPT_INTEGRATION.md)
 - [Import format](IMPORTS.md)
 - [Verified status and next steps](STATUS.md)
 - [Working instructions](INSTRUCTIONS.md)

@@ -1,6 +1,9 @@
-function officeSprite(avatar) {
-  const initials = {robot: "G", researcher: "R", writer: "W", reviewer: "V"};
-  return `<circle cy="-22" r="19" fill="#00008f" stroke="white" stroke-width="2"></circle><text y="-17" text-anchor="middle" fill="white" font-size="13" font-weight="700">${initials[avatar] || "G"}</text>`;
+function officeSprite(agent) {
+  const column = ["orchestrator", "scriptwriter", "illustrator", "designer", "validator", "publisher"]
+    .indexOf(avatarIdentity(agent.avatar, agent.agentId));
+  return [0, 1].map(row => `<svg class="office-${row ? "step" : "idle"}" x="-24" y="-65" width="48" height="94"
+    viewBox="${column * 192} ${row * 384} 192 384" overflow="hidden">
+    <image href="/crew-axa.png" width="1152" height="768"></image></svg>`).join("");
 }
 
 function officeExchanges(record) {
@@ -182,11 +185,10 @@ function officeMarkup(record, manager, exchange, isLive) {
       ${animate ? `<path class="office-walk-route" d="M${from.x} ${from.y}L${to.x} ${to.y}"/>` : ""}
       ${agents.map(({a, x, y, color}) => {
         const walking = animate && a === from.a;
-        // The sprite sheet faces right. Mirror only the artwork so labels stay readable.
         return `<g transform="translate(${x} ${y})"><g class="office-figure ${walking ? "office-walking" : ""}" data-office-agent="${esc(a.agentId)}"
           style="--suit:${color};--walk-x:${walking ? dx : 0}px;--walk-y:${walking ? dy : 0}px">
           <ellipse class="office-shadow" cx="0" cy="28" rx="25" ry="5" fill="#203448" fill-opacity=".19"/>
-          <g class="office-character">${officeSprite(a.avatar)}</g>
+          <g class="office-character" transform="scale(${walking && dx < 0 ? -1 : 1} 1)">${officeSprite(a)}</g>
           <text class="office-name" x="0" y="44" text-anchor="middle">${esc(a.agent)}</text>
           <text class="office-agent-status" x="0" y="57" text-anchor="middle"></text>
         </g></g>`;

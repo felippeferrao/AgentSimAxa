@@ -12,6 +12,6 @@ Create the server-only `secrets/site-login.json` with a `users` array. Each acco
 
 To change accounts or passwords, update that protected file and recreate the container (`docker compose up -d --force-recreate`) to remount it and invalidate sessions. Check for active executions first. Each login receives an independent random 12-hour session. Sign out invalidates only that session. Public startup fails without valid login configuration; API, event streams and generated files all require authentication.
 
-Set `OPENAI_API_KEY` in the ignored `.env` file. Compose passes it to the server process. Recreate the container after changing it. Use the Connection button to verify the project key can list models.
+For the AXA deployment, follow the [Secure GPT integration guide](../KnowledgeBase/SECURE_GPT_INTEGRATION.md). Keep the previous OpenAI adapter unconfigured while the AXA API contract and credentials are pending.
 
 Before publishing an installation, verify proxy syntax, HTTPS, redirects, login failure/success, unauthenticated data denial, session invalidation, persistent volumes and container health. Preserve unrelated services. Rollback should affect only this application's container and proxy configuration; keep its data and protected settings.
