@@ -7,8 +7,8 @@
     "locale": "en",
     "quality_profile": "showcase",
     "repository": {
-      "url": "https://github.com/felippeferrao/AgentSim.git",
-      "revision": "baa07248a6a9e197d429e27b5907560a98a2eba1"
+      "url": "https://github.com/felippeferrao/AgentSimAxa.git",
+      "revision": "c7d5e51a1e0a1012ceb0b93c7bec633c603d20af"
     }
   },
   "components": [
@@ -28,13 +28,8 @@
       "sources": [
         {
           "path": "static/app.js",
-          "line": 1065,
-          "end_line": 1074
-        },
-        {
-          "path": "static/app.js",
-          "line": 1089,
-          "end_line": 1097
+          "line": 1105,
+          "end_line": 1168
         }
       ]
     },
@@ -54,13 +49,13 @@
       "sources": [
         {
           "path": "deploy/nginx.conf.example",
-          "line": 11,
-          "end_line": 33
+          "line": 1,
+          "end_line": 34
         },
         {
           "path": "compose.yaml",
-          "line": 7,
-          "end_line": 14
+          "line": 1,
+          "end_line": 25
         }
       ]
     },
@@ -80,18 +75,13 @@
       "sources": [
         {
           "path": "server.py",
-          "line": 404,
-          "end_line": 440
-        },
-        {
-          "path": "server.py",
-          "line": 897,
-          "end_line": 918
+          "line": 729,
+          "end_line": 757
         },
         {
           "path": "site_access.py",
-          "line": 52,
-          "end_line": 69
+          "line": 17,
+          "end_line": 60
         }
       ]
     },
@@ -111,13 +101,8 @@
       "sources": [
         {
           "path": "server.py",
-          "line": 53,
-          "end_line": 61
-        },
-        {
-          "path": "server.py",
-          "line": 893,
-          "end_line": 915
+          "line": 67,
+          "end_line": 103
         }
       ]
     },
@@ -137,13 +122,8 @@
       "sources": [
         {
           "path": "orchestration.py",
-          "line": 230,
-          "end_line": 263
-        },
-        {
-          "path": "runtime.py",
-          "line": 529,
-          "end_line": 533
+          "line": 181,
+          "end_line": 217
         }
       ]
     },
@@ -163,18 +143,8 @@
       "sources": [
         {
           "path": "runtime.py",
-          "line": 537,
-          "end_line": 544
-        },
-        {
-          "path": "runtime.py",
-          "line": 609,
-          "end_line": 617
-        },
-        {
-          "path": "orchestration.py",
-          "line": 254,
-          "end_line": 263
+          "line": 353,
+          "end_line": 404
         }
       ]
     },
@@ -193,9 +163,14 @@
       ],
       "sources": [
         {
+          "path": "auth.py",
+          "line": 30,
+          "end_line": 70
+        },
+        {
           "path": "runtime.py",
-          "line": 231,
-          "end_line": 253
+          "line": 172,
+          "end_line": 222
         }
       ]
     },
@@ -216,7 +191,7 @@
         {
           "path": "harness.py",
           "line": 44,
-          "end_line": 57
+          "end_line": 75
         }
       ]
     },
@@ -236,13 +211,13 @@
       "sources": [
         {
           "path": "harness.py",
-          "line": 494,
-          "end_line": 510
+          "line": 349,
+          "end_line": 400
         },
         {
           "path": "harness.py",
-          "line": 44,
-          "end_line": 80
+          "line": 580,
+          "end_line": 595
         }
       ]
     },
@@ -262,8 +237,8 @@
       "sources": [
         {
           "path": "harness.py",
-          "line": 126,
-          "end_line": 178
+          "line": 596,
+          "end_line": 651
         }
       ]
     },
@@ -285,11 +260,6 @@
           "path": "external_mcp.py",
           "line": 304,
           "end_line": 317
-        },
-        {
-          "path": "external_mcp.py",
-          "line": 257,
-          "end_line": 268
         }
       ]
     }
@@ -393,9 +363,9 @@
       "dot": "emerald",
       "title": "Deployment model",
       "items": [
-        "Nginx terminates TLS; the AgentSim container is exposed only through host loopback. API, agents, tools and the image CLI run in the same container.",
-        "SQLite, generated files and independent provider credentials persist in a server-mounted data directory. Login configuration is mounted separately.",
-        "OpenAI and MCP access depends on configured accounts, available models and explicit per-agent permissions. This map does not claim those connections are currently active."
+        "Nginx terminates TLS and forwards requests to the loopback-bound Docker service.",
+        "SQLite, generated files and MCP settings persist in the data volume. Site login and the OpenAI environment key are managed on the host.",
+        "The workspace key authorizes the OpenAI Responses and Images APIs. The manager and per-agent permissions control tool use."
       ]
     }
   ]
