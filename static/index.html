@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><link rel="icon" href="/axa-logo.png" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>AXA Agent Sim</title
+  ><link rel="stylesheet" href="/style.css" />
+  <body>
+    <header>
+      <strong class="brand"
+        ><img src="/axa-logo.png" alt="" /> <span>AXA Agent Sim</span></strong
+      >
+      <div>
+        <button id="connection" aria-label="Account connection settings">
+          ○ Connection required</button
+        ><button id="help">ⓘ Help</button><b class="tag">Real AI workspace</b>
+      </div>
+    </header>
+    <aside>
+      <section class="welcome">
+        <h3>Agent workspace</h3>
+      </section>
+      <nav id="nav" aria-label="Main menu"></nav>
+    </aside>
+    <main id="main"></main>
+    <footer class="app-footer" aria-label="Application credits">
+      <span>Created in 2026 by Felippe da Silva Ferrão - <a href="mailto:felippeferrao@wabix.net">felippeferrao@wabix.net</a></span>
+      <strong><img src="/wabix-logo.png" alt="" /> Powered By Wabix</strong>
+    </footer>
+    <div id="toast" role="status"></div>
+    <dialog id="dialog">
+      <form method="dialog">
+        <button class="close" aria-label="Close">×</button>
+      </form>
+      <div id="dialogBody"></div>
+    </dialog>
+    <script src="/crew-office.js"></script>
+    <script src="/brain.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

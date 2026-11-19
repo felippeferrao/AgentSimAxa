@@ -1,0 +1,90 @@
+2026-10-20 — continuation verification
+Python 3.12.9; macOS Apple Silicon
+
+PYTHONPATH=. .venv/bin/python -m unittest discover -s tests -v
+Ran 27 tests in 7.030s — OK
+
+Actual transport and framework evidence:
+- Authenticated MCP Streamable HTTP server in a separate controlled process.
+- Bearer and X-API-Key discovery, initialize, tools/list, actual tools/call.
+- Granular grants, nested schema validation, optional arguments, changed
+  connection/tool revisions and edit/remove revocation.
+- HTTP connection management round-trip; credentials absent from responses.
+- Actual CrewAI calls the controlled HTTP MCP tool using a scripted LLM.
+- Actual app HTTP API + actual CrewAI + controlled Responses SSE endpoint +
+  application SSE progress + persisted final results, automatically.
+- Two model names remain distinct through actual provider fixture requests.
+- Runtime mapping test preserves different ChatGPT/API selections per agent.
+
+Contract/data evidence:
+- Rich profile migration persists to SQLite and preserves existing permissions.
+- Expanded role/goal/context/instructions/examples/expected output map to CrewAI.
+- Advanced behavior settings, optional model parameters and avatars round-trip.
+- Empty startup and explicit non-destructive example loading.
+- Signed JWT fixture, PKCE/state/host isolation and incomplete registration retry.
+- A saved credential is not treated as valid without provider verification.
+- Failed real preflight creates no sample run.
+- Declarative imports, skill dependency restrictions, arithmetic and stdio MCP.
+
+Browser evidence:
+- Disconnected Home automatically opens Connection setup.
+- Home shows six explanatory dashboard cards and SQLite/example status.
+- Agents retains Import setup / Export setup.
+- Four actual tab panels; Profile is hidden when Tools is selected.
+- Unsaved tool selections survive tab switches. Avatar choices are available.
+- Watch & run defaults to real automatic mode; no Next control in real mode.
+- Screenshots captured under KnowledgeBase/design/.
+
+uvx ruff check auth.py server.py runtime.py profiles.py external_mcp.py tests
+All checks passed!
+node --check static/app.js — passed
+git diff --check — passed
+
+Important evidence boundary:
+Controlled/scripted LLM responses and fixture token counts are NOT live AI.
+The existing OpenAI browser authorization attempt returned HTTP 403 before
+consent. No live OAuth token exchange or external AI inference was completed.
+No Brain Mentoria AI credential or Cortex/Codex token was used.
+
+Manager-led teams verification (2026-10-20)
+- python unittest discover: 30 tests, 8.413 seconds, OK.
+- Ruff and node --check static/app.js: pass.
+- Scripted LLM + actual CrewAI: delegated Writer three times (including a question), skipped Researcher, actual final manager result; no private ReAct reasoning in events.
+- Controlled HTTP Responses endpoint + actual app SSE: delegation observed before completion, worker reply and final manager result persisted, per-agent model choices and usage preserved.
+- Browser on isolated port 8081: active Writer card, waiting Reviewer manager, idle Researcher, live delegation and returned messages; zero active cards after completion.
+- Production app configuration browser checks: manager selection available, Architecture menu and diagram render, small header robot removed, account model combo remains automatic. No production team edits saved.
+
+Harness integration verification (2026-10-20, latest)
+- Full unittest suite: 38 tests, 17.008 seconds, OK.
+- uv tool run ruff check ., node --check static/app.js, git diff --check: pass.
+- Actual PDF render and Plotly HTML/PNG3200x2000/SVG export; visual inspection passed.
+- Real local stdio MCP ZIP import/discovery/call with disposable credential; no auto grants.
+- Actual CrewAI scripted manager skill selection -> delegated worker context -> PDF/Plotly tools.
+- HTTP Responses/app SSE/persistent history/artifact retrieval, failure and restart interruption tests.
+- Browser fixture port8081: automatic 33-event execution, visible skill reason/class/location, real artifact gallery, persisted after reload, MD upload/view and ZIP auto discovery.
+- Actual ChatGPT account capability probe: hosted web_search completed with web_search_call + message. Hosted image_generation HTTP400 explicitly unsupported for subscription-sharing; separate configured image API adapter tested with controlled response, no live key supplied.
+- Streaming regression: collect response.output_item.done when terminal response.completed.output is empty; require completed terminal, never log raw private deltas.
+- Restarted actual8080 and reloaded user tab; Tools5, image model configuration, Skills View/Remove, plugin ZIP/key form and History visibly present. Existing profile data not edited.
+- screenshots: design/harness-tools.png (actual app); design/harness-history-fixture.png (controlled test app).
+
+Chat workspace verification (2026-10-20)
+- Full automated suite: 41 tests passed; controlled Responses + real CrewAI/SSE/SQLite.
+- Arbitrary explicit agent with no teams; second selected team's manager; follow-up public context actually present in provider requests; target/history overrides ignored.
+- Chat rejection/interruption persistence and idempotent startup recovery; prior execution retrieval after clearing in-process jobs.
+- Browser port8081: Team chat triggers skill selection/delegation, actual PDF/Plotly, final chat reply; second message has separate selectable execution; reload retains chat; Writer selection runs only Writer.
+- Chat and right execution panel scroll independently. Step inspect shows class, where and evidence next to chat. Existing style retained.
+- Actual8080: removed sample selector; all four current agents available including Billy; opened empty Billy chat without sending a message or altering profiles/grants.
+- Proof screenshots: design/chat-billy.png (actual), design/chat-execution-fixture.png (controlled provider).
+
+Native ChatGPT images and in-chat files (2026-10-20)
+- Official native Codex CLI 0.163.0-alpha.10.2; native image_generation feature enabled.
+- Authenticated independently into AgentSim .local/image-runtime via official OAuth browser flow. No other auth cache copied, no image API key used.
+- Initial native generator probe created a real PNG; visual inspection confirmed dog/soda/hot-air balloon/Eiffel Tower.
+- Actual Billy UI execution c87731eb-adc2-4b48-bcb2-b5f148667f10: 17 events, 21:54:10–21:54:57, actual function call -> native runtime -> verified PNG -> final response.
+- Browser image decode: 1145x1374, complete=true, visible within assistant message. Inspect shows native runtime class/location.
+- Public event stream excludes raw native model text/reasoning/stderr/credentials. Native usage comes from terminal runtime usage event.
+- 46 tests, 20.975 seconds, OK; Ruff, node syntax, whitespace checks pass.
+- Full controlled PDF/Plotly application test asserts all four real artifact metadata records persist into the assistant chat message and actual PDF bytes remain retrievable.
+- Proof: design/native-chatgpt-image-chat.png (real external image inference).
+
+- Additional isolated browser verification: assistant message contains PDF document card plus Plotly HTML iframe, PNG and SVG download, using actual local file generation and a controlled provider. Proof: design/pdf-chart-chat-fixture.png.

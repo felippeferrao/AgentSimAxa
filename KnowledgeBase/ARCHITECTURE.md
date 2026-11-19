@@ -1,0 +1,45 @@
+# Architecture and decisions
+
+Browser HTML/CSS/JavaScript → loopback Python HTTP server → SQLite configuration/history. Real jobs run in a background thread; `/api/jobs/<id>/events` streams SSE snapshots. The browser updates automatically until completion or failure. JSON job snapshots remain available for status checks. Only the explicitly selected educational sample mode uses deterministic content and Next step.
+
+Home is the dashboard. Watch & run owns the approved visualization. Initial installation has no helpers; example loading is an explicit non-destructive merge. Legacy sample definitions are tagged, and `profiles.py` migrates legacy agents into persisted rich profiles without resetting data. See [profile schema/mapping](AGENT_PROFILES.md).
+
+Each helper has its own ResponsesLLM adapter, connection and model. CrewAI 1.15.28 owns real Agent/Task/Crew execution. Managed teams use Process.hierarchical with a user-selected manager and a single goal task; delegation determines which workers execute and their order. The legacy sequential path and single-agent mode remain compatible. See ORCHESTRATION.md. Profile instructions and labeled teaching examples are actually sent; behavior settings map to framework fields. API credentials are shared connection records, not global model overrides. Optional temperature/output limits are omitted unless set. Failed or unsupported requests remain failures. No raw private model reasoning is exposed.
+
+The Responses adapter sends store=false and stream=true and requires response.completed. Provider usage is aggregated by actual task; missing usage stays unavailable. Controlled fixture counts are not evidence of external inference.
+
+External MCP uses the official SDK's Streamable HTTP client. The protected local registry is the authority for connection configuration and credentials; public catalog snapshots strip credentials. Discovery does not grant tools. Calls enforce explicit agent grant, current tool/connection revision and nested JSON input schema. Editing/removing/changed definitions revoke permissions. Redirects and remote schema references are blocked. External tool arguments/raw results stay outside timeline events; the result is passed to the authorized helper. The built-in teaching documents still run over real MCP stdio. [MCP details](EXTERNAL_MCP.md).
+
+The server reads OpenAI API settings from the ignored `.env` file. Model discovery and inference use the OpenAI API. Workspace login is separate.
+
+The official WABIX logo was reused with the owner’s authorization. Approved artwork remains unmodified and is displayed as a CSS atlas. User direction controls the palette and layout over generic brand-color defaults.
+
+Single-user loopback application, no public authentication/tenancy. Completed work persists; background jobs are not restart-durable. A single real run is accepted at a time. Agent configuration edits affect subsequent runs; MCP destination/tool revisions also protect stale active wrappers. Credentials use owner-only local files rather than encryption. Future public hosting needs durable jobs, authentication, isolation and a proper vault.
+
+The integration harness provides local PDF and Plotly renderers, model-hosted web research, and OpenAI Images API generation and edits.
+
+Conversational execution adds `conversation_store.ConversationStore` for SQLite messages/run links and `execution_context.resolve_target` for explicit targets. The same automatic CrewAI/SSE/harness path handles each message; [chat context and endpoints](CHAT_EXECUTION.md).
+
+## Editorial magazine skill adapter
+
+`skills/minimax-pdf/SKILL.md` retains the Codex-format adaptation of MiniMax-AI's MIT skill and its fixed magazine renderer. The default PDF Generator uses `skills/magazine-layout/SKILL.md`, adapted from isjiamu/jiamu-skills, with a self-contained twelve-style summary and separate picture-book guidance. Full upstream references, licenses and pinned provenance remain in the repository; browser template examples are not loaded as universal layout instructions. Normal SkillSelector selection records the public reason in Execution; assigning a skill never grants a tool.
+
+`harness.PDFGenerator.render` dispatches only explicit JSON `layout: magazine` requests to `magazine_pdf.render`. Existing cover/chapters/pages and conversation-owned image URLs remain the content contract. The additional fields are publication, issue, design.accent, cover.abstract, standfirst, caption and pull_quote. ReportLab handles balanced columns; Times and Helvetica keep rendering offline. Only validated image paths supplied by the existing artifact resolver are read, text is escaped, and arbitrary HTML/scripts/font URLs are unsupported. Stored generator source retains the original request for follow-ups. This adds a rendering option without imposing agent order or mandatory specialists.
+
+For `layout: editorial-html`, `editorial_html.render` renders the agent's full HTML/CSS offline through WeasyPrint with only authorized images and bundled fonts. It supplies no cover, article or book template. The skill guides medium selection, separate covers when requested, illustration-led picture-book composition and readable typography; the agent chooses trim, colors, geometry and storytelling pace. A separate cover plus two story pages is three pages; that count comes from the user's brief, not application code.
+
+## Owner-authorized protected Docker deployment (2026-11-07)
+
+For protected deployments, Nginx terminates HTTPS at the installation’s configured hostname; a configurable host loopback port reaches the Docker application port 8080. `AGENTSIM_PUBLIC_URL` allows exactly the configured host/origin in addition to the local defaults and requires a valid `AGENTSIM_LOGIN_FILE` at startup. `site_access` checks owner credentials using scrypt and issues random expiring in-memory session tokens; HTTP handlers enforce login before all APIs, SSE and artifacts. Login uses a Secure/HttpOnly/SameSite cookie; Sign out invalidates the token. Existing execution state is one shared owner workspace.
+
+Docker binds persistent ignored `data/` at `/app/.local` for the dynamic database and private integration settings and artifacts. The owner login hash is mounted separately read-only. No desktop/Cortex credentials or operational database are copied. `auth.disconnect` clears this application's OpenAI stores and native image login; the handler rejects disconnect during active runs. Remote independent OAuth retains its loopback contract with a protected manual callback completion route; native images use the CLI device-code login on public deployments. See [deployment details](../deploy/README.md).
+
+Named-login refinement: the protected configuration accepts `users: [{username, salt, password_hash}]` with unique usernames and independent password salts, while retaining legacy single-account compatibility. Each successful login receives a separate session token; all configured accounts share the same AgentSim workspace. Account/password changes remain server-only and require container recreation to remount the configuration and invalidate existing sessions.
+
+## Archify interactive system map
+
+The Architecture menu now embeds the real standalone Archify output at `/architecture.html?theme=light` and offers a full-window link. The typed source is `architecture/agentsim.architecture.json`, with repository-pinned component evidence. The deployment serves the generated HTML from the same authenticated application; no repository or credentials are sent to a hosted diagram service. Archify handles search, zoom, component source details, dependency reach, route tracing and export. The team configuration below remains dynamic; the source-backed system map is an architectural snapshot, while Watch & run remains the live execution view. [Generation and third-party licensing](../architecture/README.md).
+
+## Execution-scoped team skill policy
+
+Teams may set `skillsEnabled` (boolean, default enabled for backward compatibility). With false, `runtime.execute` clones only the execution state, clears its skill catalog and assignments, and records a public `skill_policy` event. The manager receives no skill-selection tool when the effective catalog is empty. The persistent registry and other teams are unchanged. The Teams editor exposes this control in English; tool/MCP permissions remain independent. This supports honest no-skill comparisons without globally removing skills or changing manager routing.

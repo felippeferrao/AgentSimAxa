@@ -1,0 +1,36 @@
+__pycache__/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+.DS_Store
+.env
+.env.*
+!.env.example
+!.env.sample
+auth.json
+credentials.json
+secrets.json
+*.pem
+*.key
+work/
+.venv/
+.local/
+.playwright-cli/
+
+# Server-owned deployment state and access credentials.
+data/
+secrets/
+
+# Installation-specific configuration stays outside version control.
+deploy/nginx.conf
+compose.override.yaml
+
+# Runtime-only installation files and build logs.
+nginx.conf
+services-before.txt
+deployed-revision.txt
+*.log
+*.tar.gz

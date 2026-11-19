@@ -1,0 +1,27 @@
+.git
+.venv
+.local
+work
+outputs
+__pycache__
+**/__pycache__
+*.db
+*.db-*
+*.sqlite*
+.env*
+*.pem
+*.key
+tests
+
+data
+secrets
+
+deploy/nginx.conf
+compose.override.yaml
+
+# Runtime-only installation files and build logs.
+nginx.conf
+services-before.txt
+deployed-revision.txt
+*.log
+*.tar.gz
